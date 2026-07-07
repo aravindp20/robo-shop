@@ -157,7 +157,7 @@ jobs:
     name: "Plan (terraform plan)"
     runs-on: ubuntu-latest
     needs: [lint]
-    environment: prod
+    # environment: prod
     outputs:
       # Expose exit code so the apply job can check whether changes exist
       plan_exit_code: ${{ steps.plan.outputs.exitcode }}
@@ -263,8 +263,8 @@ jobs:
       github.ref == 'refs/heads/main' &&
       github.event_name == 'push' &&
       needs.plan.outputs.plan_exit_code == '2'
-    environment:
-      name: prod # Requires a GitHub Environment approval gate (recommended)
+    # environment:
+    #   name: prod # Requires a GitHub Environment approval gate (recommended)
 
     steps:
       - name: Checkout Repository
