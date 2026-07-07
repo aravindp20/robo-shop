@@ -3,3 +3,35 @@
 *-private.*
 vendor/
 Gopkg.lock
+
+# ── Terraform ──────────────────────────────────────────────────────────────
+# Local state — never commit; state is stored in S3 remote backend
+*.tfstate
+*.tfstate.backup
+
+# Plan binary files — generated at CI time; not for version control
+*.tfplan
+tfplan.binary
+
+# Terraform init cache directories
+**/.terraform/
+**/.terraform.lock.hcl
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Sensitive variable override files
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# TFLint plugin cache
+**/.tflint.d/
+
+# ── AI Agent Skills ────────────────────────────────────────────────────────
+# Local agent skill definitions — not for version control
+.agents/skills/**/SKILL.md
+.agents/
