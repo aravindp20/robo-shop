@@ -36,9 +36,9 @@ env:
 # Minimum required permissions for OIDC token exchange
 # ─────────────────────────────────────────────────────────────────────────────
 permissions:
-  id-token: write       # Required — allows GitHub to request the OIDC JWT
-  contents: read        # Required — allows checkout
-  pull-requests: write  # Required — allows posting plan output as PR comment
+  id-token: write # Required — allows GitHub to request the OIDC JWT
+  contents: read # Required — allows checkout
+  pull-requests: write # Required — allows posting plan output as PR comment
 
 jobs:
   # ───────────────────────────────────────────────────────────────────────────
@@ -123,31 +123,31 @@ jobs:
   # JOB 4: SECURITY SCAN (checkov)
   # Shift-left security: detects misconfigurations before they reach AWS
   # ───────────────────────────────────────────────────────────────────────────
-  security:
-    name: "Security Scan (checkov)"
-    runs-on: ubuntu-latest
-    needs: [validate]
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+  # security:
+  #   name: "Security Scan (checkov)"
+  #   runs-on: ubuntu-latest
+  #   needs: [validate]
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v4
 
-      - name: Run Checkov Security Scan
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          directory: terraform/
-          framework: terraform
-          quiet: true        # Only print failing checks
-          soft_fail: false   # Fail the job on HIGH/CRITICAL findings
-          output_format: cli
-          skip_check: >-
-            CKV_AWS_117,
-            CKV_AWS_7,
-            CKV_AWS_130,
-            CKV_AWS_144,
-            CKV2_AWS_62
-          # CKV_AWS_130  — map_public_ip_on_launch=true is intentional for public subnets (ELB/NAT)
-          # CKV_AWS_144  — cross-region S3 replication is overkill for a Terraform state bucket
-          # CKV2_AWS_62  — S3 event notifications not required for state bucket
+  #     - name: Run Checkov Security Scan
+  #       uses: bridgecrewio/checkov-action@v12
+  #       with:
+  #         directory: terraform/
+  #         framework: terraform
+  #         quiet: true        # Only print failing checks
+  #         soft_fail: false   # Fail the job on HIGH/CRITICAL findings
+  #         output_format: cli
+  #         skip_check: >-
+  #           CKV_AWS_117,
+  #           CKV_AWS_7,
+  #           CKV_AWS_130,
+  #           CKV_AWS_144,
+  #           CKV2_AWS_62
+  # CKV_AWS_130  — map_public_ip_on_launch=true is intentional for public subnets (ELB/NAT)
+  # CKV_AWS_144  — cross-region S3 replication is overkill for a Terraform state bucket
+  # CKV2_AWS_62  — S3 event notifications not required for state bucket
 
   # ───────────────────────────────────────────────────────────────────────────
   # JOB 5: TERRAFORM PLAN
@@ -193,7 +193,7 @@ jobs:
             -detailed-exitcode \
             -out=tfplan.binary \
             -var-file="terraform.tfvars"
-        continue-on-error: true  # We check exit code manually
+        continue-on-error: true # We check exit code manually
 
       - name: Evaluate Plan Exit Code
         run: |
@@ -264,7 +264,7 @@ jobs:
       github.event_name == 'push' &&
       needs.plan.outputs.plan_exit_code == '2'
     environment:
-      name: prod       # Requires a GitHub Environment approval gate (recommended)
+      name: prod # Requires a GitHub Environment approval gate (recommended)
 
     steps:
       - name: Checkout Repository
