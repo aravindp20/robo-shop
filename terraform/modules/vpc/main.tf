@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.10.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0"
+    }
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# VPC
+# ─────────────────────────────────────────────────────────────────────────────
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -8,6 +22,90 @@ resource "aws_vpc" "main" {
   }
 }
 
+# CKV2_AWS_12: Lock down the default security group — no ingress or egress
+# The default SG is created automatically by AWS; we manage it to ensure it
+# allows no traffic, forcing all resources to use explicit security groups.
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  # Explicitly empty — deny all ingress and egress
+  ingress = []
+  egress  = []
+
+  tags = {
+    Name = "robot-shop-default-sg-locked"
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# VPC Flow Logs (CKV2_AWS_11)
+# Captures all accepted/rejected traffic for security auditing
+# ─────────────────────────────────────────────────────────────────────────────
+resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
+  name              = "/aws/vpc/robot-shop-flow-logs"
+  retention_in_days = 30
+
+  tags = {
+    Name = "robot-shop-vpc-flow-logs"
+  }
+}
+
+resource "aws_iam_role" "vpc_flow_logs" {
+  name = "robot-shop-vpc-flow-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "vpc-flow-logs.amazonaws.com"
+      }
+    }]
+  })
+
+  tags = {
+    Name = "robot-shop-vpc-flow-logs-role"
+  }
+}
+
+resource "aws_iam_role_policy" "vpc_flow_logs" {
+  name = "robot-shop-vpc-flow-logs-policy"
+  role = aws_iam_role.vpc_flow_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ]
+      Resource = "*"
+    }]
+  })
+}
+
+resource "aws_flow_log" "main" {
+  vpc_id          = aws_vpc.main.id
+  traffic_type    = "ALL"
+  iam_role_arn    = aws_iam_role.vpc_flow_logs.arn
+  log_destination = aws_cloudwatch_log_group.vpc_flow_logs.arn
+
+  tags = {
+    Name = "robot-shop-vpc-flow-log"
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Subnets
+# ─────────────────────────────────────────────────────────────────────────────
+
+# NOTE: map_public_ip_on_launch = true is intentional for public subnets.
+# CKV_AWS_130 is suppressed via checkov skip_check in the CI workflow.
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnet_cidrs)
   vpc_id                  = aws_vpc.main.id
@@ -42,6 +140,9 @@ resource "aws_subnet" "private_data" {
   }
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Internet Gateway
+# ─────────────────────────────────────────────────────────────────────────────
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
@@ -50,6 +151,9 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# NAT Gateways (one per AZ for HA)
+# ─────────────────────────────────────────────────────────────────────────────
 resource "aws_eip" "nat" {
   count  = length(var.public_subnet_cidrs)
   domain = "vpc"
@@ -71,6 +175,9 @@ resource "aws_nat_gateway" "nat" {
   depends_on = [aws_internet_gateway.igw]
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Route Tables
+# ─────────────────────────────────────────────────────────────────────────────
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 

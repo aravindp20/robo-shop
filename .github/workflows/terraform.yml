@@ -141,7 +141,13 @@ jobs:
           output_format: cli
           skip_check: >-
             CKV_AWS_117,
-            CKV_AWS_7
+            CKV_AWS_7,
+            CKV_AWS_130,
+            CKV_AWS_144,
+            CKV2_AWS_62
+          # CKV_AWS_130  — map_public_ip_on_launch=true is intentional for public subnets (ELB/NAT)
+          # CKV_AWS_144  — cross-region S3 replication is overkill for a Terraform state bucket
+          # CKV2_AWS_62  — S3 event notifications not required for state bucket
 
   # ───────────────────────────────────────────────────────────────────────────
   # JOB 5: TERRAFORM PLAN
