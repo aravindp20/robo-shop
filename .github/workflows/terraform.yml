@@ -19,7 +19,8 @@ on:
 # ─────────────────────────────────────────────────────────────────────────────
 concurrency:
   group: terraform-prod-${{ github.ref }}
-  cancel-in-progress: false # Never cancel a running apply; let it finish
+  cancel-in-progress: false
+  # Never cancel a running apply; let it finish
 
 defaults:
   run:
