@@ -11,12 +11,12 @@ This document tracks the progress of the AWS cloud infrastructure implementation
 - [x] **Security & Identity**
   - [x] Custom Security Groups Module (peer-to-peer least privilege rules)
   - [x] IAM Roles Module (EKS control plane, node group, IRSA policies)
-- [ ] **Container Registry**
-  - [ ] ECR Repositories for 8 microservice containers
-- [ ] **Kubernetes Compute Cluster**
-  - [ ] EKS Cluster definition
-  - [ ] EKS Worker Node groups
-  - [ ] OIDC Provider config
+- [x] **Container Registry**
+  - [x] ECR Repositories for 8 microservice containers
+- [x] **Kubernetes Compute Cluster**
+  - [x] EKS Cluster definition
+  - [x] EKS Worker Node groups
+  - [x] OIDC Provider config
 - [ ] **Database & Messaging Tier**
   - [ ] Multi-AZ RDS MySQL database (Shipping, Ratings services)
   - [ ] ElastiCache Redis cluster (Cart, User services)

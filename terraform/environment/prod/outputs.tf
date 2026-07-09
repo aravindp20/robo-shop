@@ -69,8 +69,45 @@ output "eks_node_role_arn" {
   description = "The ARN of the EKS Node Group IAM role"
 }
 
-output "eks_secrets_irsa_role_arn" {
-  value       = module.iam.eks_secrets_irsa_role_arn
-  description = "The ARN of the EKS Secrets Manager IRSA IAM role (if OIDC is configured)"
+output "secrets_manager_policy_arn" {
+  value       = module.iam.secrets_manager_policy_arn
+  description = "The ARN of the Secrets Manager access policy"
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ECR Outputs
+# ─────────────────────────────────────────────────────────────────────────────
+output "ecr_repository_urls" {
+  value       = module.ecr.repository_urls
+  description = "A map of repository names to their corresponding ECR registry URLs"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EKS Outputs
+# ─────────────────────────────────────────────────────────────────────────────
+output "eks_cluster_name" {
+  value       = module.eks.cluster_name
+  description = "The name of the EKS Cluster"
+}
+
+output "eks_cluster_endpoint" {
+  value       = module.eks.cluster_endpoint
+  description = "The endpoint URL for the EKS Cluster control plane"
+}
+
+output "eks_cluster_certificate_authority_data" {
+  value       = module.eks.cluster_certificate_authority_data
+  description = "Base64 encoded certificate data required to communicate with the cluster"
+}
+
+output "eks_oidc_provider_arn" {
+  value       = module.eks.oidc_provider_arn
+  description = "The ARN of the EKS OIDC Provider"
+}
+
+output "eks_secrets_irsa_role_arn" {
+  value       = module.eks.eks_secrets_irsa_role_arn
+  description = "The ARN of the EKS Secrets Manager IRSA IAM role"
+}
+
 

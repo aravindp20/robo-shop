@@ -116,44 +116,4 @@ resource "aws_iam_role_policy_attachment" "node_secrets_manager" {
   role       = aws_iam_role.eks_node.name
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. IAM Role for EKS Service Accounts (IRSA)
-#    Creates the role dynamically if the OIDC provider is configured.
-# ─────────────────────────────────────────────────────────────────────────────
 
-data "aws_iam_policy_document" "eks_oidc_assume" {
-  count = var.oidc_provider_arn != "" && var.oidc_provider_url != "" ? 1 : 0
-
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
-
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(var.oidc_provider_url, "https://", "")}:sub"
-      # Limits access strictly to a dedicated service account name inside any namespace
-      values = ["system:serviceaccount:*:robot-shop-secrets-sa"]
-    }
-
-    principals {
-      identifiers = [var.oidc_provider_arn]
-      type        = "Federated"
-    }
-  }
-}
-
-resource "aws_iam_role" "eks_secrets_irsa" {
-  count              = var.oidc_provider_arn != "" && var.oidc_provider_url != "" ? 1 : 0
-  name               = "robot-shop-${var.environment}-secrets-irsa-role"
-  assume_role_policy = data.aws_iam_policy_document.eks_oidc_assume[0].json
-
-  tags = {
-    Name = "robot-shop-${var.environment}-secrets-irsa-role"
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "irsa_secrets_manager" {
-  count      = var.oidc_provider_arn != "" && var.oidc_provider_url != "" ? 1 : 0
-  policy_arn = aws_iam_policy.secrets_manager.arn
-  role       = aws_iam_role.eks_secrets_irsa[0].name
-}

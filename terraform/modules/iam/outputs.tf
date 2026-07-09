@@ -8,7 +8,8 @@ output "eks_node_role_arn" {
   description = "The ARN of the EKS Node Group IAM role"
 }
 
-output "eks_secrets_irsa_role_arn" {
-  value       = length(aws_iam_role.eks_secrets_irsa) > 0 ? aws_iam_role.eks_secrets_irsa[0].arn : null
-  description = "The ARN of the EKS Secrets Manager IRSA IAM role, if OIDC was configured"
+output "secrets_manager_policy_arn" {
+  value       = aws_iam_policy.secrets_manager.arn
+  description = "The ARN of the Secrets Manager access policy"
 }
+

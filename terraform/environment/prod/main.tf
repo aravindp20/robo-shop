@@ -133,3 +133,44 @@ module "iam" {
   environment = "prod"
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ECR Repositories Module
+# ─────────────────────────────────────────────────────────────────────────────
+module "ecr" {
+  source      = "../../modules/ecr"
+  environment = "prod"
+
+  repository_names = [
+    "web",
+    "cart",
+    "catalogue",
+    "user",
+    "payment",
+    "shipping",
+    "ratings",
+    "dispatch",
+    "load-gen"
+  ]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EKS Cluster Module
+# ─────────────────────────────────────────────────────────────────────────────
+module "eks" {
+  source = "../../modules/eks"
+
+  cluster_name               = "robot-shop-prod"
+  vpc_id                     = module.vpc.vpc_id
+  subnet_ids                 = module.vpc.private_app_subnet_ids
+  cluster_role_arn           = module.iam.eks_cluster_role_arn
+  node_role_arn              = module.iam.eks_node_role_arn
+  eks_nodes_sg_id            = module.security_groups.eks_nodes_sg_id
+  secrets_manager_policy_arn = module.iam.secrets_manager_policy_arn
+
+  instance_types = ["t3.medium"]
+  desired_size   = 2
+  min_size       = 2
+  max_size       = 5
+}
+
+
