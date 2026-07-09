@@ -128,6 +128,14 @@ resource "aws_eks_node_group" "nodes" {
     ignore_changes = [scaling_config[0].desired_size] # Allow autoscalers (HPA/Karpenter) to scale
   }
 
+  # Industry-standard EKS node group provisioning timeouts.
+  # Node groups typically take 15–30 min but can extend during region congestion or AMI updates.
+  timeouts {
+    create = "60m"
+    update = "60m"
+    delete = "60m"
+  }
+
   tags = {
     Name = "${var.cluster_name}-node-group"
   }

@@ -26,8 +26,8 @@ variable "eks_nodes_sg_id" {
 
 variable "instance_types" {
   type        = list(string)
-  description = "Instance types to use for EKS worker nodes"
-  default     = ["t3.medium"]
+  description = "Instance types to use for EKS worker nodes. Minimum t3.small (2 GiB RAM) required for EKS system pods."
+  default     = ["t3.small"]
 }
 
 variable "desired_size" {
