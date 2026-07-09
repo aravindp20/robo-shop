@@ -114,3 +114,22 @@ module "vpc" {
   private_data_subnet_cidrs = var.private_data_subnet_cidrs
   availability_zones        = var.availability_zones
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Security Groups Module
+# ─────────────────────────────────────────────────────────────────────────────
+module "security_groups" {
+  source = "../../modules/security-groups"
+
+  vpc_id = module.vpc.vpc_id
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IAM Roles Module
+# ─────────────────────────────────────────────────────────────────────────────
+module "iam" {
+  source = "../../modules/iam"
+
+  environment = "prod"
+}
+
