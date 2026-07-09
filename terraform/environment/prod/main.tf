@@ -160,7 +160,6 @@ module "eks" {
   source = "../../modules/eks"
 
   cluster_name               = "robot-shop-prod"
-  vpc_id                     = module.vpc.vpc_id
   subnet_ids                 = module.vpc.private_app_subnet_ids
   cluster_role_arn           = module.iam.eks_cluster_role_arn
   node_role_arn              = module.iam.eks_node_role_arn
