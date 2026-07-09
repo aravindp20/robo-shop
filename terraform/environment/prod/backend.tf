@@ -29,3 +29,15 @@
 #   }
 # }
 
+# ── PHASE 2 ACTIVE ── Bucket exists. Uncomment the block below and run:
+#   terraform init -migrate-state
+terraform {
+  backend "s3" {
+    bucket       = "robot-shop-prod-tfstate-bucket-unique-suffix" # Must match state_bucket_name in tfvars
+    key          = "prod/terraform.tfstate"
+    region       = "ap-south-1"
+    encrypt      = true
+    use_lockfile = true # Enables native S3 locking (requires Terraform 1.10+)
+  }
+}
+
