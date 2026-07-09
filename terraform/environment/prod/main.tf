@@ -91,6 +91,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "state_lifecycle" {
     id     = "expire-noncurrent-state-versions"
     status = "Enabled"
 
+    filter {}
+
     noncurrent_version_expiration {
       noncurrent_days = 90
     }
@@ -165,7 +167,6 @@ module "eks" {
   node_role_arn              = module.iam.eks_node_role_arn
   eks_nodes_sg_id            = module.security_groups.eks_nodes_sg_id
   secrets_manager_policy_arn = module.iam.secrets_manager_policy_arn
-  vpc_id                     = module.vpc.vpc_id
 
   instance_types = ["t3.small"]
   desired_size   = 2
