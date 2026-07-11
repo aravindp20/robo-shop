@@ -89,8 +89,14 @@ resource "aws_launch_template" "eks_nodes" {
   description            = "Custom launch template for EKS worker nodes"
   update_default_version = true
 
-  # Attach our custom security group for DB/Queue peer connections
-  vpc_security_group_ids = [var.eks_nodes_sg_id]
+  # When using a custom launch template with explicit security groups, EKS does NOT
+  # automatically attach the cluster's managed security group to nodes.
+  # Without it, the control plane cannot reach nodes and they fail to join the cluster.
+  # We must include BOTH: our custom SG (for DB/Queue access) + the cluster's managed SG.
+  vpc_security_group_ids = [
+    var.eks_nodes_sg_id,
+    aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
+  ]
 
   tag_specifications {
     resource_type = "instance"
