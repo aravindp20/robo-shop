@@ -4,11 +4,6 @@ variable "aws_region" {
   default     = "ap-south-1"
 }
 
-variable "state_bucket_name" {
-  type        = string
-  description = "The name of the S3 bucket for Terraform remote state"
-}
-
 variable "vpc_cidr" {
   type        = string
   description = "The CIDR block for the VPC"

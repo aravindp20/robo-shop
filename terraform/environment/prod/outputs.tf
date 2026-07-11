@@ -1,12 +1,3 @@
-output "state_bucket_arn" {
-  value       = aws_s3_bucket.terraform_state.arn
-  description = "The ARN of the S3 bucket storing Terraform remote state"
-}
-
-output "state_kms_key_arn" {
-  value       = aws_kms_key.terraform_state.arn
-  description = "The ARN of the KMS key used to encrypt the Terraform state bucket"
-}
 
 output "vpc_id" {
   value       = module.vpc.vpc_id
